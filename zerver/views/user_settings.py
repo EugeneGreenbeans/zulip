@@ -272,10 +272,17 @@ def delete_avatar_backend(request: HttpRequest, user_profile: UserProfile) -> Ht
 @has_request_variables
 def regenerate_api_key(request: HttpRequest, user_profile: UserProfile) -> HttpResponse:
     new_api_key = do_regenerate_api_key(user_profile, user_profile)
-    json_result = dict(
-        api_key = new_api_key,
-    )
-    return json_success(json_result)
+    if new_api_key:        
+        json_success_result = {
+            api_key = new_api_key,
+        }
+        return json_success(json_result)
+    else:   
+        json_error_result = {
+            "msg" : "Permission denied.",
+            "status": 409,
+            }
+        return json_error(**json_error_result)
 
 @human_users_only
 @has_request_variables
