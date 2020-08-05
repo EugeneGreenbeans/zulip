@@ -3279,7 +3279,13 @@ def do_change_tos_version(user_profile: UserProfile, tos_version: str) -> None:
                                  event_type=RealmAuditLog.USER_TOS_VERSION_CHANGED,
                                  event_time=event_time)
 
-def do_regenerate_api_key(user_profile: UserProfile, acting_user: UserProfile) -> str:
+def do_regenerate_api_key(user_profile: UserProfile, 
+                          acting_user: UserProfile, 
+                          denied_permission: List = [UserProfile.ROLE_MEMBER,\
+                                                     UserProfile.ROLE_GUEST] ) -> Any:
+    user_role = user_profile.role.verbose_name
+    if user_role in denied_permission and not user_profile.is_bot:
+        return False
     old_api_key = user_profile.api_key
     new_api_key = generate_api_key()
     user_profile.api_key = new_api_key
